@@ -1,0 +1,4 @@
+Piezo	KEYWORD1
+tone	KEYWORD2
+playSong	KEYWORD2
+resetSong	KEYWORD2

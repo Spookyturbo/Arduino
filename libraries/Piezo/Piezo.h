@@ -1,3 +1,8 @@
+#ifndef Piezo_h
+#define Piezo_h
+
+#include "Arduino.h"
+
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35
@@ -87,3 +92,19 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
+
+class Piezo {
+
+	public:
+		Piezo(int pin);
+		void tone(int frequency, uint16_t duration);
+		void playSong(int[] melody, int[] durations, int melodyLength);
+		void resetSong();
+	private:
+		int _pin;
+		int currentNote;
+	
+
+}
+
+#endif

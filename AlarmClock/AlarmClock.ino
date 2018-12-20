@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 #include <Wire.h>
 #include <RTClib.h>
-#include "music.h"
+#include "Piezo.h"
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 RTC_DS3231 rtc;
@@ -12,32 +12,32 @@ struct Time {
   unsigned int minute: 6;
 };
 
-int  melody[] = {
-  NOTE_E7, NOTE_E7, 0, NOTE_E7,
-  0, NOTE_C7, NOTE_E7, 0,
-  NOTE_G7, 0, 0,  0,
-  NOTE_G6, 0, 0, 0,
-
-  NOTE_C7, 0, 0, NOTE_G6,
-  0, 0, NOTE_E6, 0,
-  0, NOTE_A6, 0, NOTE_B6,
-  0, NOTE_AS6, NOTE_A6, 0,
-
-  NOTE_G6, NOTE_E7, NOTE_G7,
-  NOTE_A7, 0, NOTE_F7, NOTE_G7,
-  0, NOTE_E7, 0, NOTE_C7,
-  NOTE_D7, NOTE_B6, 0, 0,
-
-  NOTE_C7, 0, 0, NOTE_G6,
-  0, 0, NOTE_E6, 0,
-  0, NOTE_A6, 0, NOTE_B6,
-  0, NOTE_AS6, NOTE_A6, 0,
-
-  NOTE_G6, NOTE_E7, NOTE_G7,
-  NOTE_A7, 0, NOTE_F7, NOTE_G7,
-  0, NOTE_E7, 0, NOTE_C7,
-  NOTE_D7, NOTE_B6, 0, 0
-};
+//int  melody[] = {
+//  NOTE_E7, NOTE_E7, 0, NOTE_E7,
+//  0, NOTE_C7, NOTE_E7, 0,
+//  NOTE_G7, 0, 0,  0,
+//  NOTE_G6, 0, 0, 0,
+//
+//  NOTE_C7, 0, 0, NOTE_G6,
+//  0, 0, NOTE_E6, 0,
+//  0, NOTE_A6, 0, NOTE_B6,
+//  0, NOTE_AS6, NOTE_A6, 0,
+//
+//  NOTE_G6, NOTE_E7, NOTE_G7,
+//  NOTE_A7, 0, NOTE_F7, NOTE_G7,
+//  0, NOTE_E7, 0, NOTE_C7,
+//  NOTE_D7, NOTE_B6, 0, 0,
+//
+//  NOTE_C7, 0, 0, NOTE_G6,
+//  0, 0, NOTE_E6, 0,
+//  0, NOTE_A6, 0, NOTE_B6,
+//  0, NOTE_AS6, NOTE_A6, 0,
+//
+//  NOTE_G6, NOTE_E7, NOTE_G7,
+//  NOTE_A7, 0, NOTE_F7, NOTE_G7,
+//  0, NOTE_E7, 0, NOTE_C7,
+//  NOTE_D7, NOTE_B6, 0, 0
+//};
 
 //Storing weekday info in the flash memory
 const char weekDay_0[] PROGMEM = "Sun";
@@ -104,9 +104,11 @@ const uint8_t alarmLength = 30;
 bool alarmBuzzing = false;
 struct Time alarmTime;
 
+Piezo buzzer(alarmBuzzPin);
+
 void setup() {
   Serial.begin(9600);
-
+  int test = melody[0];
   //Initialise alarm
   alarmTime.hour = 6;
   alarmTime.minute = 20;
