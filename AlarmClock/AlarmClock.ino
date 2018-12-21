@@ -11,54 +11,33 @@ struct Time {
   unsigned int minute: 6;
 };
 
-//Storing weekday info in the flash memory
-const char weekDay_0[] PROGMEM = "Sun";
-const char weekDay_1[] PROGMEM = "Mon";
-const char weekDay_2[] PROGMEM = "Tue";
-const char weekDay_3[] PROGMEM = "Wed";
-const char weekDay_4[] PROGMEM = "Thu";
-const char weekDay_5[] PROGMEM = "Fri";
-const char weekDay_6[] PROGMEM = "Sat";
-
-const char * const weekDays[] PROGMEM =
+//Store weekdays in flash memory
+const char weekDays[7][4] PROGMEM =
 {
-  weekDay_0,
-  weekDay_1,
-  weekDay_2,
-  weekDay_3,
-  weekDay_4,
-  weekDay_5,
-  weekDay_6
+  { "Sun" },
+  { "Mon" },
+  { "Tue" },
+  { "Wed" },
+  { "Thu" },
+  { "Fri" },
+  { "Sat" }
 };
 
-//Storing month info in the flash memory
-const char month_0[] PROGMEM = "Jan";
-const char month_1[] PROGMEM = "Feb";
-const char month_2[] PROGMEM = "Mar";
-const char month_3[] PROGMEM = "Apr";
-const char month_4[] PROGMEM = "May";
-const char month_5[] PROGMEM = "Jun";
-const char month_6[] PROGMEM = "Jul";
-const char month_7[] PROGMEM = "Aug";
-const char month_8[] PROGMEM = "Sep";
-const char month_9[] PROGMEM = "Oct";
-const char month_10[] PROGMEM = "Nov";
-const char month_11[] PROGMEM = "Dec";
-
-const char * const months[] PROGMEM =
+//Store months in flash memory
+const char months[12][4] PROGMEM =
 {
-  month_0,
-  month_1,
-  month_2,
-  month_3,
-  month_4,
-  month_5,
-  month_6,
-  month_7,
-  month_8,
-  month_9,
-  month_10,
-  month_11
+  { "Jan" },
+  { "Feb" },
+  { "Mar" },
+  { "Apr" },
+  { "May" },
+  { "Jun" },
+  { "Jul" },
+  { "Aug" },
+  { "Sep" },
+  { "Oct" },
+  { "Nov" },
+  { "Dec" }
 };
 
 const uint8_t sleepButtonPin = 3;
@@ -215,13 +194,12 @@ void printDate() {
 
   //Retrieve month from flash memory
   char month[4];
-  strcpy_P(month, (char*)pgm_read_word(&(months[currentTime.month() - 1])));
-
+  memcpy_P(&month, &months[currentTime.month() - 1], 4);
   uint8_t day = currentTime.day();
 
   //Retrieve weekDay from flash memory
   char weekDay[4];
-  strcpy_P(weekDay, (char*)pgm_read_word(&(weekDays[currentTime.dayOfTheWeek()])));
+  memcpy_P(&weekDay, &weekDays[currentTime.dayOfTheWeek()], 4);
 
   lcd.setCursor(0, 0);
   lcd.print(weekDay);
