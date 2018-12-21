@@ -98,7 +98,7 @@ class Piezo {
 	public:
 		Piezo(int pin);
 		void playTone(int frequency, uint16_t duration);
-		void playSong(int melody[], int durations[], int melodyLength);
+		void playSong(int melody[], int durations[], int melodyLength, float noteMultiplier);
 		void resetSong();
 	private:
 		int _pin;

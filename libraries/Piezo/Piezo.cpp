@@ -12,9 +12,10 @@ void Piezo::playTone(int frequency, uint16_t duration) {
 }
 
 //This must be constantly called to play the whole song. This is to prevent this from halting the program until the song finishes
-void Piezo::playSong(int melody[], int durations[], int melodyLength) {
+//The note multiplier is used so if the song is too fast or slow you can adjust it with a simple number > 1 = Speed up < 1 = slow down
+void Piezo::playSong(int melody[], int durations[], int melodyLength, float noteMultiplier) {
 	static long lastNoteTime;
-	int noteDuration = 2000 / durations[currentNote];
+	int noteDuration = 1000 / (durations[currentNote] * noteMultiplier);
 	//Initial note condition
 	if(currentNote == -1 || millis() - lastNoteTime >= noteDuration) {
 		currentNote++;
