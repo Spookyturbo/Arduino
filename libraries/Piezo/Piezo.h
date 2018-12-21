@@ -97,14 +97,14 @@ class Piezo {
 
 	public:
 		Piezo(int pin);
-		void tone(int frequency, uint16_t duration);
-		void playSong(int[] melody, int[] durations, int melodyLength);
+		void playTone(int frequency, uint16_t duration);
+		void playSong(int melody[], int durations[], int melodyLength);
 		void resetSong();
 	private:
 		int _pin;
 		int currentNote;
 	
 
-}
+};
 
 #endif
