@@ -124,69 +124,50 @@ int zeldaThemeTempo[] = {
   2, 8, 8, 8, 8, 8, 8, 6, 16, 16, 4, 8, 8, 8, 8, 8, 8, 6, 16, 16, 4, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 ,8 ,8, 2, 8, 8, 8 ,8 ,8, 8, 6, 16, 16, 2, 4, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 ,8 ,8, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 8, 16, 16, 4, 4, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 ,8 ,8, 2, 8, 8, 8 ,8 ,8, 8, 6, 16, 16, 2, 4, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 ,8 ,8, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 8, 16, 16, 4, 4, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8
 };
 
-int zeldaThemeLength = sizeof(songOfStormsMelody) / sizeof(songOfStormsMelody[0]);
+int zeldaThemeLength = sizeof(zeldaThemeMelody) / sizeof(zeldaThemeMelody[0]);
 float zeldaThemeMultiplier = 0.75f;
-
-//Storing weekday info in the flash memory
-const char weekDay_0[] PROGMEM = "Sun";
-const char weekDay_1[] PROGMEM = "Mon";
-const char weekDay_2[] PROGMEM = "Tue";
-const char weekDay_3[] PROGMEM = "Wed";
-const char weekDay_4[] PROGMEM = "Thu";
-const char weekDay_5[] PROGMEM = "Fri";
-const char weekDay_6[] PROGMEM = "Sat";
-
-const char * const weekDays[] PROGMEM =
+//Store weekdays in flash memory
+const char weekDays[7][4] PROGMEM =
 {
-  weekDay_0,
-  weekDay_1,
-  weekDay_2,
-  weekDay_3,
-  weekDay_4,
-  weekDay_5,
-  weekDay_6
+  { "Sun" },
+  { "Mon" },
+  { "Tue" },
+  { "Wed" },
+  { "Thu" },
+  { "Fri" },
+  { "Sat" }
 };
 
-//Storing month info in the flash memory
-const char month_0[] PROGMEM = "Jan";
-const char month_1[] PROGMEM = "Feb";
-const char month_2[] PROGMEM = "Mar";
-const char month_3[] PROGMEM = "Apr";
-const char month_4[] PROGMEM = "May";
-const char month_5[] PROGMEM = "Jun";
-const char month_6[] PROGMEM = "Jul";
-const char month_7[] PROGMEM = "Aug";
-const char month_8[] PROGMEM = "Sep";
-const char month_9[] PROGMEM = "Oct";
-const char month_10[] PROGMEM = "Nov";
-const char month_11[] PROGMEM = "Dec";
-
-const char * const months[] PROGMEM =
+//Store months in flash memory
+const char months[12][4] PROGMEM =
 {
-  month_0,
-  month_1,
-  month_2,
-  month_3,
-  month_4,
-  month_5,
-  month_6,
-  month_7,
-  month_8,
-  month_9,
-  month_10,
-  month_11
+  { "Jan" },
+  { "Feb" },
+  { "Mar" },
+  { "Apr" },
+  { "May" },
+  { "Jun" },
+  { "Jul" },
+  { "Aug" },
+  { "Sep" },
+  { "Oct" },
+  { "Nov" },
+  { "Dec" }
 };
 
-const uint8_t sleepButtonPin = 3;
+//Input variables
+const uint8_t loadPin = 3;
+const uint8_t clkPin = 4;
+const uint8_t dataPin = 5;
+
+//Sleep Variables
 const uint8_t sleepLightPin = 13;
-const uint8_t alarmOnPin = 4;
-const uint8_t alarmBuzzPin = 2;
-
 //120 seconds
 const uint8_t sleepLength = 120;
 bool sleepEnabled = false;
-bool previousSleepButtonState = false;
 
+//Alarm Variables
+const uint8_t alarmBuzzPin = 2;
 const uint8_t alarmFrequency = 4500;
 const uint8_t alarmLength = 30;
 bool alarmBuzzing = false;
@@ -194,17 +175,24 @@ struct Time alarmTime;
 
 Piezo buzzer(alarmBuzzPin);
 
+uint8_t buttonStates = 0;
+
 void setup() {
   Serial.begin(9600);
-  
+
+  //Initialise Shift register
+  pinMode(loadPin, OUTPUT);
+  pinMode(clkPin, OUTPUT);
+  pinMode(dataPin, INPUT);
+  digitalWrite(loadPin, HIGH);
+  digitalWrite(clkPin, HIGH);
+
   //Initialise alarm
   alarmTime.hour = 6;
   alarmTime.minute = 20;
   pinMode(alarmBuzzPin, OUTPUT);
-  pinMode(alarmOnPin, INPUT_PULLUP);
 
   //Setup sleep button
-  pinMode(sleepButtonPin, INPUT_PULLUP);
   pinMode(sleepLightPin, OUTPUT);
   digitalWrite(sleepLightPin, LOW);
 
@@ -225,7 +213,8 @@ void setup() {
 void loop() {
   printDate();
   printTime();
-  //checkAlarm();
+  readInput();
+  checkAlarm();
 
   //Managing the sleep states
   bool sleepButtonPressed = getSleepDown();
@@ -236,7 +225,7 @@ void loop() {
     disableSleep();
   }
 
-  buzzer.playSong(zeldaThemeMelody, zeldaThemeTempo, zeldaThemeLength, zeldaThemeMultiplier);
+  //buzzer.playSong(zeldaThemeMelody, zeldaThemeTempo, zeldaThemeLength, zeldaThemeMultiplier);
 }
 
 void checkAlarm() {
@@ -247,7 +236,6 @@ void checkAlarm() {
   if (alarmBuzzing && isAlarmEnabled()) {
     if (sleepEnabled) {
       stopAlarm();
-      //Light up the sleep button
       //Exit sleep mode
       if (currentTime.unixtime() - sleepStartTime >= sleepLength) {
         disableSleep();
@@ -264,7 +252,6 @@ void checkAlarm() {
       }
       //Sleep start time will stop updating when sleep is enabled
       sleepStartTime = currentTime.unixtime();
-      //Unlight the sleep button
     }
   }
   else { //Happens when the alarm finishes or when the alarm is turned off
@@ -280,17 +267,29 @@ void checkAlarm() {
   }
 }
 
-void soundAlarm() {
-  tone(alarmBuzzPin, alarmFrequency);
+void readInput() {
+  digitalWrite(clkPin, HIGH);
+  digitalWrite(loadPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(loadPin, HIGH);
+
+  buttonStates = shiftIn(dataPin, clkPin, MSBFIRST);
 }
 
-void musicAlarm() {
+/*
+   Returns true when button is first pressed
+   Button must be let go once to be pressed again
+*/
+bool getSleepDown() {
+  static bool previousState;
+  bool justPressed = false;
+  bool buttonPressed = buttonStates & B00000010; //!digitalRead(sleepButtonPin);
 
-}
-
-//Stops the alarm buzzing
-void stopAlarm() {
-  noTone(alarmBuzzPin);
+  if (!previousState && buttonPressed) {
+    justPressed = true;
+  }
+  previousState = buttonPressed;
+  return justPressed;
 }
 
 //turns on the light and only works while alarm is buzzing
@@ -309,23 +308,16 @@ void disableSleep() {
 
 //Returns the status of the alarm switch
 bool isAlarmEnabled() {
-  return !digitalRead(alarmOnPin);
+  return buttonStates & B00000001;
 }
 
-/*
-   Returns true when button is first pressed
-   Button must be let go once to be pressed again
-*/
-bool getSleepDown() {
-  static bool previousState;
-  bool justPressed = false;
-  bool buttonPressed = !digitalRead(sleepButtonPin);
+void soundAlarm() {
+  tone(alarmBuzzPin, alarmFrequency);
+}
 
-  if (!previousState && buttonPressed) {
-    justPressed = true;
-  }
-  previousState = buttonPressed;
-  return justPressed;
+//Stops the alarm buzzing
+void stopAlarm() {
+  noTone(alarmBuzzPin);
 }
 
 /*
@@ -338,13 +330,12 @@ void printDate() {
 
   //Retrieve month from flash memory
   char month[4];
-  strcpy_P(month, (char*)pgm_read_word(&(months[currentTime.month() - 1])));
-
+  memcpy_P(&month, &months[currentTime.month() - 1], 4);
   uint8_t day = currentTime.day();
 
   //Retrieve weekDay from flash memory
   char weekDay[4];
-  strcpy_P(weekDay, (char*)pgm_read_word(&(weekDays[currentTime.dayOfTheWeek()])));
+  memcpy_P(&weekDay, &weekDays[currentTime.dayOfTheWeek()], 4);
 
   lcd.setCursor(0, 0);
   lcd.print(weekDay);
