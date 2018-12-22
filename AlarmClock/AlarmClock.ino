@@ -28,6 +28,16 @@ const uint16_t marioUnderworldTempo[] PROGMEM = {12, 12, 12, 12, 12, 12, 6, 3, 1
 const uint16_t zeldaThemeMelody[] PROGMEM = {NOTE_AS4, 0, 0, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, 0, NOTE_GS4, NOTE_AS4, 0, 0, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, 0, NOTE_GS4, NOTE_AS4, 0, 0, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_AS4, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_AS4, NOTE_F3, NOTE_F3, 0, NOTE_AS4, NOTE_AS4, NOTE_C5, NOTE_D5, NOTE_DS5, NOTE_F5, 0, NOTE_F5, NOTE_F5, NOTE_FS5, NOTE_GS5, NOTE_AS5, 0, NOTE_AS5, NOTE_AS5, NOTE_AS5, NOTE_GS5, NOTE_FS5, NOTE_GS5, 0, NOTE_FS5, NOTE_F5, NOTE_F5, NOTE_DS5, NOTE_DS5, NOTE_F5, NOTE_FS5, NOTE_F5, NOTE_DS5, NOTE_CS5, NOTE_CS5, NOTE_DS5, NOTE_F5, NOTE_DS5, NOTE_CS5, NOTE_C5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_G5, NOTE_F5, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_AS4, NOTE_F3, NOTE_F3, 0, NOTE_AS4, NOTE_AS4, NOTE_C5, NOTE_D5, NOTE_DS5, NOTE_F5, 0, NOTE_F5, NOTE_F5, NOTE_FS5, NOTE_GS5, NOTE_AS5, 0, NOTE_CS6, NOTE_C6, NOTE_A5, 0, NOTE_F5, NOTE_FS5, 0, NOTE_AS5, NOTE_A5, NOTE_F5, 0, NOTE_F5, NOTE_FS5, 0, NOTE_AS5, NOTE_A5, NOTE_F5, 0, NOTE_D5, NOTE_DS5, 0, NOTE_FS5, NOTE_F5, NOTE_CS5, 0, NOTE_AS4, NOTE_C5, NOTE_C5, NOTE_D5, NOTE_E5, 0, NOTE_G5, NOTE_F5, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_AS4, NOTE_F3, NOTE_F3, 0, NOTE_AS4, NOTE_AS4, NOTE_C5, NOTE_D5, NOTE_DS5, NOTE_F5, 0, NOTE_F5, NOTE_F5, NOTE_FS5, NOTE_GS5, NOTE_AS5, 0, NOTE_AS5, NOTE_AS5, NOTE_AS5, NOTE_GS5, NOTE_FS5, NOTE_GS5, 0, NOTE_FS5, NOTE_F5, NOTE_F5, NOTE_DS5, NOTE_DS5, NOTE_F5, NOTE_FS5, NOTE_F5, NOTE_DS5, NOTE_CS5, NOTE_CS5, NOTE_DS5, NOTE_F5, NOTE_DS5, NOTE_CS5, NOTE_C5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_G5, NOTE_F5, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_AS4, NOTE_F3, NOTE_F3, 0, NOTE_AS4, NOTE_AS4, NOTE_C5, NOTE_D5, NOTE_DS5, NOTE_F5, 0, NOTE_F5, NOTE_F5, NOTE_FS5, NOTE_GS5, NOTE_AS5, 0, NOTE_CS6, NOTE_C6, NOTE_A5, 0, NOTE_F5, NOTE_FS5, 0, NOTE_AS5, NOTE_A5, NOTE_F5, 0, NOTE_F5, NOTE_FS5, 0, NOTE_AS5, NOTE_A5, NOTE_F5, 0, NOTE_D5, NOTE_DS5, 0, NOTE_FS5, NOTE_F5, NOTE_CS5, 0, NOTE_AS4, NOTE_C5, NOTE_C5, NOTE_D5, NOTE_E5, 0, NOTE_G5, NOTE_F5, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3, NOTE_F3};
 const uint16_t zeldaThemeTempo[] PROGMEM = {2, 8, 8, 8, 8, 8, 8, 6, 16, 16, 4, 8, 8, 8, 8, 8, 8, 6, 16, 16, 4, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 , 8 , 8, 2, 8, 8, 8 , 8 , 8, 8, 6, 16, 16, 2, 4, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 , 8 , 8, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 8, 16, 16, 4, 4, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 , 8 , 8, 2, 8, 8, 8 , 8 , 8, 8, 6, 16, 16, 2, 4, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 8, 8, 8, 16, 16, 2, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8, 4, 4, 6, 16, 16, 16, 16, 16, 16, 2, 8, 8, 8 , 8 , 8, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 8, 16, 16, 4, 4, 4, 8, 16, 16, 8, 16, 16, 8, 16, 16, 8, 8};
 
+const uint16_t jingleBellsMelody[] PROGMEM = {NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_G5, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_F5, NOTE_F5, NOTE_F5, NOTE_F5, NOTE_F5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_E5, NOTE_D5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_G5};
+const uint16_t jingleBellsTempo[] PROGMEM = {8, 8, 4, 8, 8, 4, 8, 8, 8, 8, 2, 8, 8, 8, 8, 8, 8, 8, 16, 16, 8, 8, 8, 8, 4, 4};
+
+//We wish you a merry christmas
+const uint16_t wishMelody[] PROGMEM = {NOTE_B3, NOTE_F4, NOTE_F4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4, NOTE_D4, NOTE_D4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_E4, NOTE_E4, NOTE_A4, NOTE_A4, NOTE_B4, NOTE_A4, NOTE_G4, NOTE_F4, NOTE_D4, NOTE_B3, NOTE_B3, NOTE_D4, NOTE_G4, NOTE_E4, NOTE_F4};
+const uint16_t wishTempo[] PROGMEM = {4, 4, 8, 8, 8, 8, 4, 4, 4, 4, 8, 8, 8, 8, 4, 4, 4, 4, 8, 8, 8, 8, 4, 4, 8, 8, 4, 4, 4, 2};
+
+const uint16_t santaMelody[] PROGMEM = {NOTE_G4, NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, NOTE_C5, NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_G4, NOTE_A4, NOTE_G4, NOTE_F4, NOTE_F4, NOTE_E4, NOTE_G4, NOTE_C4, NOTE_E4, NOTE_D4, NOTE_F4, NOTE_B3, NOTE_C4};
+const uint16_t santaTempo[] PROGMEM = {8, 8, 8, 4, 4, 4, 8, 8, 4, 4, 4, 8, 8, 4, 4, 4, 8, 8, 4, 2, 4, 4, 4, 4, 4, 2, 4, 1};
+
 const Song alarmSongs[] PROGMEM =
 {
   { //Mario Theme
@@ -47,6 +57,24 @@ const Song alarmSongs[] PROGMEM =
     zeldaThemeTempo,
     268,
     0.75f
+  },
+  {
+    jingleBellsMelody,
+    jingleBellsTempo,
+    26,
+    0.5f
+  },
+  {
+    wishMelody,
+    wishTempo,
+    30,
+    1.0f
+  },
+  {
+    santaMelody,
+    santaTempo,
+    28,
+    1.0f
   }
 };
 
@@ -95,6 +123,9 @@ const uint8_t alarmBuzzPin = 2;
 const uint8_t alarmFrequency = 4500;
 const uint8_t alarmLength = 30;
 bool alarmBuzzing = false;
+//-2 = Random, -1 = Normal Buzzer, 0-2 = specificAlarmSong
+int8_t usersAlarmChoice = -1;
+uint8_t chosenAlarmSong = 2;
 Time alarmTime;
 
 Piezo buzzer(alarmBuzzPin);
@@ -112,9 +143,10 @@ void setup() {
   digitalWrite(clkPin, HIGH);
 
   //Initialise alarm
-  alarmTime.hour = 6;
-  alarmTime.minute = 20;
+  alarmTime.hour = 11;
+  alarmTime.minute = 6;
   pinMode(alarmBuzzPin, OUTPUT);
+  randomSeed(analogRead(0));
 
   //Setup sleep button
   pinMode(sleepLightPin, OUTPUT);
@@ -122,6 +154,7 @@ void setup() {
 
   //setting up the display
   lcd.begin(16, 2);
+  
   //setting up the clock
   if (!rtc.begin()) {
     Serial.println(F("Clock could not properly initialise"));
@@ -138,10 +171,8 @@ void loop() {
   printDate();
   printTime();
   readInput();
-  //checkAlarm();
-
-  playSongAtIndex(2);
-
+  checkAlarm();
+  
   //Managing the sleep states
   bool sleepButtonPressed = getSleepDown();
   if (sleepButtonPressed && !sleepEnabled) {
@@ -152,20 +183,11 @@ void loop() {
   }
 }
 
-void playSongAtIndex(int index) {
-  Song song;
-  memcpy_P(&song, &alarmSongs[index], sizeof(song));
-
-  uint16_t melody[song.length];
-  //Multiply song length by 2 because melody elements are each 2 bytes
-  memcpy_P(melody, song.melody, song.length * 2);
-
-  uint16_t tempo[song.length];
-  memcpy_P(tempo, song.tempo, song.length * 2);
-  
-  buzzer.playSong(melody, tempo, song.length, song.speedMultiplier);
-}
-
+/*
+ * Manages all of the alarm states including
+ * what to do when it is time for the alarm to go off and
+ * when the alarm is going off and sleep is enabled/disabled
+ */
 void checkAlarm() {
   static unsigned long alarmStartTime = 0;
   static unsigned long sleepStartTime = 0;
@@ -198,13 +220,23 @@ void checkAlarm() {
     stopAlarm();
   }
 
-  if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == 0 && !sleepEnabled && isAlarmEnabled()) {
+  if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == 0 && !sleepEnabled && isAlarmEnabled() && !alarmBuzzing) {
+    //random song
+    if(usersAlarmChoice == -2) {
+      chosenAlarmSong = chooseRandomSong();
+    }
+    
     soundAlarm();
     alarmBuzzing = true;
     alarmStartTime = currentTime.unixtime();
   }
 }
 
+/*
+ * Reads all of the button states from the 
+ * SN74HC165N shift in register and stores
+ * the byte in a global variable for use
+ */
 void readInput() {
   digitalWrite(clkPin, HIGH);
   digitalWrite(loadPin, LOW);
@@ -249,13 +281,46 @@ bool isAlarmEnabled() {
   return buttonStates & B00000001;
 }
 
+//Manages alarm playing songs or straight sound
 void soundAlarm() {
-  tone(alarmBuzzPin, alarmFrequency);
+  if(usersAlarmChoice == -1 ) {
+    tone(alarmBuzzPin, alarmFrequency);
+  }
+  else {
+    playSongAtIndex(chosenAlarmSong);
+  }
 }
 
 //Stops the alarm buzzing
 void stopAlarm() {
   noTone(alarmBuzzPin);
+}
+
+/*
+ * Plays the song stored in the song array at specified index
+ * This function will not continously play the song on a seperate thread.
+ * It must be repeatedly called with the same index for the song to finish.
+ * If you changed the song index, make sure you call buzzer.resetSong()
+ * for it to properly start the new one correctly.
+ */
+void playSongAtIndex(int index) {
+  Song song;
+  memcpy_P(&song, &alarmSongs[index], sizeof(song));
+
+  uint16_t melody[song.length];
+  //Multiply song length by 2 because melody elements are each 2 bytes
+  memcpy_P(melody, song.melody, song.length * 2);
+
+  uint16_t tempo[song.length];
+  memcpy_P(tempo, song.tempo, song.length * 2);
+  
+  buzzer.playSong(melody, tempo, song.length, song.speedMultiplier);
+}
+
+//Returns a random index in the alarmSongs array
+int chooseRandomSong() {
+  buzzer.resetSong();
+  return random(0, sizeof(alarmSongs) / sizeof(alarmSongs[0]));
 }
 
 /*
