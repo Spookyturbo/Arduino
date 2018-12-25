@@ -34,7 +34,7 @@ void ShiftRegIn::updateButtonState() {
 //Button number = 0-7
 bool ShiftRegIn::getButtonDown(uint8_t buttonNumber) {
 	//Not sure if the Pow function works right now
-	buttonNumber = pow(2, buttonNumber);
+	buttonNumber = B00000001 << buttonNumber;
 	bool previousState = _previousState & buttonNumber;
 	bool currentState = _currentState & buttonNumber;
 	
@@ -45,13 +45,13 @@ bool ShiftRegIn::getButtonDown(uint8_t buttonNumber) {
 }
 
 bool ShiftRegIn::getButton(uint8_t buttonNumber) {
-	buttonNumber = pow(2, buttonNumber);
+	buttonNumber = B00000001 << buttonNumber;
 	
 	return _currentState & buttonNumber;
 }
 
 bool ShiftRegIn::getButtonUp(uint8_t buttonNumber) {
-	buttonNumber = pow(2, buttonNumber);
+	buttonNumber = B00000001 << buttonNumber;
 	
 	bool previousState = _previousState & buttonNumber;
 	bool currentState = _currentState & buttonNumber;
