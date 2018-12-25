@@ -41,10 +41,12 @@ const char months[12][4] PROGMEM =
   { "Dec" }
 };
 
-//Input variables
-const uint8_t loadPin = 3;
-const uint8_t clkPin = 4;
-const uint8_t dataPin = 5;
+//load, clock, data
+ShiftRegIn buttons(3, 4, 5);
+
+//Button numbers
+const uint8_t alarmSwitch = 0;
+const uint8_t sleepButton = 1;
 
 //Sleep Variables
 const uint8_t sleepLightPin = 13;
@@ -63,13 +65,6 @@ uint8_t buttonStates = 0;
 
 void setup() {
   Serial.begin(9600);
-
-  //Initialise Shift register
-  pinMode(loadPin, OUTPUT);
-  pinMode(clkPin, OUTPUT);
-  pinMode(dataPin, INPUT);
-  digitalWrite(loadPin, HIGH);
-  digitalWrite(clkPin, HIGH);
 
   //Initialise alarm
   alarmTime.hour = 6;
@@ -97,11 +92,11 @@ void setup() {
 void loop() {
   printDate();
   printTime();
-  readInput();
+  buttons.updateButtonState();
   checkAlarm();
 
   //Managing the sleep states
-  bool sleepButtonPressed = getSleepDown();
+  bool sleepButtonPressed = buttons.getButtonDown(sleepButton);
   if (sleepButtonPressed && !sleepEnabled) {
     enableSleep();
   }
@@ -115,7 +110,9 @@ void checkAlarm() {
   static unsigned long sleepStartTime = 0;
   DateTime currentTime = rtc.now();
 
-  if (alarmBuzzing && isAlarmEnabled()) {
+  bool isAlarmEnabled = buttons.getButton(alarmSwitch);
+
+  if (alarmBuzzing && isAlarmEnabled) {
     if (sleepEnabled) {
       stopAlarm();
       //Exit sleep mode
@@ -142,36 +139,11 @@ void checkAlarm() {
     stopAlarm();
   }
 
-  if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == 0 && !sleepEnabled && isAlarmEnabled()) {
+  if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == 0 && !sleepEnabled && isAlarmEnabled) {
     soundAlarm();
     alarmBuzzing = true;
     alarmStartTime = currentTime.unixtime();
   }
-}
-
-void readInput() {
-  digitalWrite(clkPin, HIGH);
-  digitalWrite(loadPin, LOW);
-  delayMicroseconds(5);
-  digitalWrite(loadPin, HIGH);
-
-  buttonStates = shiftIn(dataPin, clkPin, MSBFIRST);
-}
-
-/*
-   Returns true when button is first pressed
-   Button must be let go once to be pressed again
-*/
-bool getSleepDown() {
-  static bool previousState;
-  bool justPressed = false;
-  bool buttonPressed = buttonStates & B00000010; //!digitalRead(sleepButtonPin);
-
-  if (!previousState && buttonPressed) {
-    justPressed = true;
-  }
-  previousState = buttonPressed;
-  return justPressed;
 }
 
 //turns on the light and only works while alarm is buzzing
@@ -186,11 +158,6 @@ void enableSleep() {
 void disableSleep() {
   sleepEnabled = false;
   digitalWrite(sleepLightPin, LOW);
-}
-
-//Returns the status of the alarm switch
-bool isAlarmEnabled() {
-  return buttonStates & B00000001;
 }
 
 void soundAlarm() {
