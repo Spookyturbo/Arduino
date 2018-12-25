@@ -1,4 +1,5 @@
 #include <avr/pgmspace.h>
+#include "ShiftRegIn.h"
 #include <LiquidCrystal.h>
 #include <Wire.h>
 #include <RTClib.h>
