@@ -220,26 +220,38 @@ void LCDControl() {
   static uint8_t previousMode = 0;
 
   switch (currentMode) {
+    //Display Time
     case 0:
       printDate();
       printTime(getCurrentTime());
       break;
+    //Set time
     case 1:
       if (currentMode != previousMode) {
         lcd.setCursor(0, 0);
         lcd.print(F("Set Time:"));
-        editTime(true);
+        editTime(true, false);
       }
       else {
-        editTime(false);
+        editTime(false, false);
       }
       break;
+    //Set Alarm
     case 2:
-
+      if (currentMode != previousMode) {
+        lcd.setCursor(0, 0);
+        lcd.print(F("Set Alarm:"));
+        editTime(true, true);
+      }
+      else {
+        editTime(false, true);
+      }
       break;
+    //Set Alarm Music
     case 3:
 
       break;
+    //Set LCD Color
     case 4:
 
       break;
@@ -261,16 +273,22 @@ void setMode(int8_t modeNumber) {
 
 /*
    Controls the editTime menu
+   Set alarm true to edit alarm time
+   Set alarm false to edit the actual time
 */
-void editTime(bool initialize) {
+void editTime(bool initialize, bool alarm) {
   static struct Time desiredTime;
 
   if (initialize) {
-    desiredTime = getCurrentTime();
+    if (!alarm) {
+      desiredTime = getCurrentTime();
+    }
+    else {
+      desiredTime = alarmTime;
+    }
   }
 
   //Controlling the blinking of whatever is being changed
-  struct Time displayTime = desiredTime;
   static bool displayNumber = true;
   //0.5seconds per blink
   if (timer(500)) {
@@ -280,7 +298,12 @@ void editTime(bool initialize) {
   //If hit enter after finish setting time go back to main display
   if (cursorPosition == 3) {
     DateTime now = rtc.now();
-    rtc.adjust(DateTime(now.year(), now.month(), now.day(), desiredTime.hour, desiredTime.minute, desiredTime.second));
+    if (!alarm) {
+      rtc.adjust(DateTime(now.year(), now.month(), now.day(), desiredTime.hour, desiredTime.minute, desiredTime.second));
+    }
+    else {
+      alarmTime = desiredTime;
+    }
     setMode(displayMode);
   }
 
@@ -297,27 +320,18 @@ void editTime(bool initialize) {
   //Applying changes
   switch (cursorPosition) {
     case 0:
-      if (!displayNumber) {
-        displayTime.hour = 31;
-      }
       desiredTime.hour = wrap(0, 23, desiredTime.hour + timeChange);
       break;
     case 1:
-      if (!displayNumber) {
-        displayTime.minute = 63;
-      }
       desiredTime.minute = wrap(0, 59, desiredTime.minute + timeChange);
       break;
     case 2:
-      if (!displayNumber) {
-        displayTime.second = 63;
-      }
       desiredTime.second = wrap(0, 59, desiredTime.second + timeChange);
       break;
   }
 
   //update the desired time on the display
-  printTime(displayTime);
+  printTime(desiredTime, (displayNumber) ? -1 : cursorPosition);
 }
 
 /*
@@ -366,8 +380,12 @@ struct Time getCurrentTime() {
    Prints out the time in format HH:MM:SS P/A
    On the second line of the LCD
    Using the given time struct
+   Exempt is used as -1, 0, 1, or 2
+   It will put a blank space instead of the
+   time value in hour, minute, or sec
+   -1 = ignore
 */
-void printTime(struct Time time) {
+void printTime(struct Time time, int exempt) {
   bool AM = true;
   if (time.hour >= 12) {
     AM = false;
@@ -381,7 +399,7 @@ void printTime(struct Time time) {
   lcd.setCursor(0, 1);
 
   //Used as a way to make the number not appear
-  if (time.hour > 12) {
+  if (exempt == 0) {
     lcd.print(F("  "));
   }
   else {
@@ -392,7 +410,7 @@ void printTime(struct Time time) {
   lcd.print(F(":"));
 
   //Used as a way to make the number not appear
-  if (time.minute >= 60) {
+  if (exempt == 1) {
     lcd.print(F("  "));
   }
   else {
@@ -402,7 +420,7 @@ void printTime(struct Time time) {
   }
   lcd.print(F(":"));
 
-  if (time.second >= 60) {
+  if (exempt == 2) {
     lcd.print(F("  "));
   }
   else {
@@ -411,6 +429,10 @@ void printTime(struct Time time) {
     lcd.print(time.second);
   }
   lcd.print((AM) ? F(" A") : F(" P"));
+}
+
+void printTime(struct Time time) {
+  printTime(time, -1);
 }
 
 //min inclusive, max inclusive
