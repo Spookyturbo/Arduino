@@ -5,9 +5,6 @@
 #include <RTClib.h>
 #include <Piezo.h>
 
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-RTC_DS3231 rtc;
-
 struct Time {
   unsigned int hour: 5;
   unsigned int minute: 6;
@@ -117,6 +114,16 @@ const char months[12][4] PROGMEM =
   { "Dec" }
 };
 
+//Set up the display
+LiquidCrystal lcd(7, 8, A3, A2, A1, 12);
+//Set up the backLight
+int brightness = 255;
+const uint8_t redLightPin = 9;
+const uint8_t greenLightPin = 10;
+const uint8_t blueLightPin = 11;
+ 
+RTC_DS3231 rtc;
+
 //load, clock, data
 ShiftRegIn buttons(3, 4, 5);
 
@@ -138,7 +145,7 @@ const uint8_t setRGBMode = 4;
 //LCD Control Variables
 uint8_t currentMode = 0;
 //For resetting currentMode, not resetting the clock
-const uint8_t maxMode = 3;
+const uint8_t maxMode = 4;
 int8_t cursorPosition = 0;
 
 //Sleep Variables
@@ -166,12 +173,17 @@ uint8_t buttonStates = 0;
 void setup() {
   Serial.begin(9600);
 
+  //Initalise RGB backlight
+  pinMode(redLightPin, OUTPUT);
+  pinMode(greenLightPin, OUTPUT);
+  pinMode(blueLightPin, OUTPUT);
+  
   //Initialise alarm
   alarmTime.hour = 6;
   alarmTime.minute = 20;
   alarmTime.second = 0;
   pinMode(alarmBuzzPin, OUTPUT);
-  randomSeed(analogRead(0));
+  randomSeed(millis());
 
   //Setup sleep button
   pinMode(sleepLightPin, OUTPUT);
@@ -190,9 +202,11 @@ void setup() {
     //Set time to compile time
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
+  setBacklight(255, 0, 255);
 }
 
 void loop() {
+
   LCDControl();
   checkControls();
   checkAlarm();
@@ -709,4 +723,25 @@ bool timer(uint32_t milliseconds) {
   }
 
   return false;
+}
+
+void setBacklight(uint8_t r, uint8_t g, uint8_t b) {
+  // normalize the light colors. Some are brighter then others
+  r = map(r, 0, 255, 0, 100);
+  g = map(g, 0, 255, 0, 150);
+
+  //set to brightness level
+  r = map(r, 0, 255, 0, brightness);
+  g = map(g, 0, 255, 0, brightness);
+  b = map(b, 0, 255, 0, brightness);
+ 
+  //backlight is common annode, invert the signal
+  r = map(r, 0, 255, 255, 0);
+  g = map(g, 0, 255, 255, 0);
+  b = map(b, 0, 255, 255, 0);
+
+  //Set the backlight
+  analogWrite(redLightPin, r);
+  analogWrite(greenLightPin, g);
+  analogWrite(blueLightPin, b);
 }
