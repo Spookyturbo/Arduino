@@ -2,4 +2,6 @@ ShiftRegIn	KEYWORD1
 getButtonDown	KEYWORD2
 getButton	KEYWORD2
 getButtonUp	KEYWORD2
+getButtonRepeat	KEYWORD2
+getButtonHeld	KEYWORD2
 updateButtonState	KEYWORD2

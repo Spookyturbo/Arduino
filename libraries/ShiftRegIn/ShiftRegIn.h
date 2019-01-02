@@ -8,6 +8,8 @@ class ShiftRegIn {
 		bool getButtonDown(uint8_t buttonNumber);
 		bool getButton(uint8_t buttonNumber);
 		bool getButtonUp(uint8_t buttonNumber);
+		bool getButtonRepeat(uint8_t buttonNumber, uint16_t buttonDelay);
+		bool getButtonHeld(uint8_t buttonNumber, uint16_t buttonDelay);
 		void updateButtonState(void);
 	private:
 		uint8_t _currentState;

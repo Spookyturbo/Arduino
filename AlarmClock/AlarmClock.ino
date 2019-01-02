@@ -206,7 +206,6 @@ void setup() {
 }
 
 void loop() {
-
   LCDControl();
   checkControls();
   checkAlarm();
@@ -328,6 +327,7 @@ void soundAlarm() {
 
 //Stops the alarm buzzing
 void stopAlarm() {
+  buzzer.resetSong();
   noTone(alarmBuzzPin);
 }
 /*
@@ -431,10 +431,10 @@ void setRGBColor(bool initialize) {
 
   int8_t desiredChange = 0;
 
-  if (buttons.getButtonDown(upButton)) {
+  if (buttons.getButtonHeld(upButton, 20)) {
     desiredChange = 1;
   }
-  else if (buttons.getButtonDown(downButton)) {
+  else if (buttons.getButtonHeld(downButton, 20)) {
     desiredChange = -1;
   }
 
@@ -450,13 +450,66 @@ void setRGBColor(bool initialize) {
       break;
   }
 
+  //Printing the colors
   lcd.setCursor(0, 1);
+
+  //Red light print
+  if (cursorPosition == 0) {
+    lcd.print(F("R"));
+  }
+  else {
+    lcd.print(F("r"));
+  }
+
   lcd.print(redLight);
-  lcd.print(F(" "));
+  if (redLight < 10) {
+    lcd.print(F("   "));
+  }
+  else if (redLight < 100) {
+    lcd.print(F("  "));
+  }
+  else {
+    lcd.print(F(" "));
+  }
+
+  //Green light print
+  if (cursorPosition == 1) {
+    lcd.print(F("G"));
+  }
+  else {
+    lcd.print(F("g"));
+  }
+
   lcd.print(greenLight);
-  lcd.print(F(" "));
+  if (greenLight < 10) {
+    lcd.print(F("   "));
+  }
+  else if (greenLight < 100) {
+    lcd.print(F("  "));
+  }
+  else {
+    lcd.print(F(" "));
+  }
+
+  //Blue light print
+  if (cursorPosition == 2) {
+    lcd.print(F("B"));
+  }
+  else {
+    lcd.print(F("b"));
+  }
+
   lcd.print(blueLight);
-  lcd.print(F("  "));
+  if (blueLight < 10) {
+    lcd.print(F("   "));
+  }
+  else if (blueLight < 100) {
+    lcd.print(F("  "));
+  }
+  else {
+    lcd.print(F(" "));
+  }
+
   setBacklight(redLight, greenLight, blueLight);
 }
 
@@ -471,9 +524,15 @@ void setAlarmMusic(bool initialize) {
   //Changing the users choice
   if (buttons.getButtonDown(upButton)) {
     usersAlarmChoice = wrap(0, 1 + songListLength, usersAlarmChoice + 1);
+    sampleMode = false;
+    previousSampleMode = false;
+    stopAlarm();
   }
   else if (buttons.getButtonDown(downButton)) {
     usersAlarmChoice = wrap(0, 1 + songListLength, usersAlarmChoice - 1);
+    sampleMode = false;
+    previousSampleMode = false;
+    stopAlarm();
   }
 
   //Clear the current song to make new for new one
@@ -487,7 +546,7 @@ void setAlarmMusic(bool initialize) {
     sampleMode = !sampleMode;
     if (!sampleMode) {
       //Reset the song for next time sample mode is turned on
-      buzzer.resetSong();
+      stopAlarm();
     }
     cursorPosition = 0;
   }
@@ -495,7 +554,6 @@ void setAlarmMusic(bool initialize) {
     sampleMode = false;
     previousSampleMode = false;
     stopAlarm();
-    buzzer.resetSong();
     setMode(currentMode - 1);
     return;
   }
@@ -505,7 +563,6 @@ void setAlarmMusic(bool initialize) {
     sampleMode = false;
     previousSampleMode = false;
     stopAlarm();
-    buzzer.resetSong();
     setMode(currentMode + 1);
     return;
   }
@@ -527,9 +584,6 @@ void setAlarmMusic(bool initialize) {
       lcd.print("Normal Buzzer   ");
       if (sampleMode) {
         soundAlarm();
-      }
-      else {
-        stopAlarm();
       }
       break;
     case 1:
@@ -767,7 +821,7 @@ int wrap(int min, int max, int number) {
 bool timer(uint32_t milliseconds) {
   static unsigned long start = 0;
 
-  if (millis() - start > milliseconds) {
+  if (abs(millis() - start) > milliseconds) {
     start = millis();
     return true;
   }

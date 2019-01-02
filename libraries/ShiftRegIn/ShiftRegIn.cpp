@@ -61,3 +61,32 @@ bool ShiftRegIn::getButtonUp(uint8_t buttonNumber) {
 	
 	return false;
 }
+
+bool ShiftRegIn::getButtonRepeat(uint8_t buttonNumber, uint16_t buttonDelay) {
+	static unsigned long startMillis = 0;
+	//Absolute value of time difference ensures no differences when millis overflows after 49 days
+	if(getButtonDown(buttonNumber) || (getButton(buttonNumber) && abs(millis() - startMillis) >= buttonDelay)) {
+		startMillis = millis();
+		return true;
+	 }
+	
+	return false;
+}
+
+bool ShiftRegIn::getButtonHeld(uint8_t buttonNumber, uint16_t buttonDelay) {
+	static unsigned long startHold = 0;
+	
+	//Initial press
+	if(getButtonDown(buttonNumber)) {
+		startHold = millis();
+		return true;
+	}
+	
+	//Repeat presses after its been held for 3/4 a second
+	if(abs(millis() - startHold) >= 750) {
+		return getButtonRepeat(buttonNumber, buttonDelay);
+	}
+	
+	//The time between being pressed and considered held
+	return false;
+}
