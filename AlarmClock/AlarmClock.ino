@@ -121,7 +121,7 @@ int brightness = 255;
 const uint8_t redLightPin = 9;
 const uint8_t greenLightPin = 10;
 const uint8_t blueLightPin = 11;
- 
+
 RTC_DS3231 rtc;
 
 //load, clock, data
@@ -177,7 +177,8 @@ void setup() {
   pinMode(redLightPin, OUTPUT);
   pinMode(greenLightPin, OUTPUT);
   pinMode(blueLightPin, OUTPUT);
-  
+  setBacklight(255, 0, 255);
+
   //Initialise alarm
   alarmTime.hour = 6;
   alarmTime.minute = 20;
@@ -202,7 +203,6 @@ void setup() {
     //Set time to compile time
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
-  setBacklight(255, 0, 255);
 }
 
 void loop() {
@@ -390,7 +390,15 @@ void LCDControl() {
       break;
     //Set LCD Color
     case 4:
-
+      if (currentMode != previousMode) {
+        previousMode = currentMode;
+        lcd.setCursor(0, 0);
+        lcd.print(F("Set RGB:"));
+        setRGBColor(true);
+      }
+      else {
+        setRGBColor(false);
+      }
       break;
   }
 }
@@ -408,6 +416,48 @@ void setMode(int8_t modeNumber) {
   lcd.print(F("                "));
   lcd.setCursor(0, 1);
   lcd.print(F("                "));
+}
+
+void setRGBColor(bool initialize) {
+
+  static uint8_t redLight = 255;
+  static uint8_t greenLight = 0;
+  static uint8_t blueLight = 255;
+
+  if (cursorPosition == 3) {
+    setMode(displayMode);
+    return;
+  }
+
+  int8_t desiredChange = 0;
+
+  if (buttons.getButtonDown(upButton)) {
+    desiredChange = 1;
+  }
+  else if (buttons.getButtonDown(downButton)) {
+    desiredChange = -1;
+  }
+
+  switch (cursorPosition) {
+    case 0:
+      redLight = constrain(redLight + desiredChange, 0, 255);
+      break;
+    case 1:
+      greenLight = constrain(greenLight + desiredChange, 0, 255);
+      break;
+    case 2:
+      blueLight = constrain(blueLight + desiredChange, 0, 255);
+      break;
+  }
+
+  lcd.setCursor(0, 1);
+  lcd.print(redLight);
+  lcd.print(F(" "));
+  lcd.print(greenLight);
+  lcd.print(F(" "));
+  lcd.print(blueLight);
+  lcd.print(F("  "));
+  setBacklight(redLight, greenLight, blueLight);
 }
 
 /*
@@ -734,7 +784,7 @@ void setBacklight(uint8_t r, uint8_t g, uint8_t b) {
   r = map(r, 0, 255, 0, brightness);
   g = map(g, 0, 255, 0, brightness);
   b = map(b, 0, 255, 0, brightness);
- 
+
   //backlight is common annode, invert the signal
   r = map(r, 0, 255, 255, 0);
   g = map(g, 0, 255, 255, 0);
