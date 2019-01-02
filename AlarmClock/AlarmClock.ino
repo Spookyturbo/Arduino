@@ -15,6 +15,7 @@ struct Time {
 };
 
 struct Song {
+  char *name;
   uint16_t *melody;
   uint16_t *tempo;
   uint16_t length;
@@ -43,42 +44,49 @@ const uint16_t santaTempo[] PROGMEM = {8, 8, 8, 4, 4, 4, 8, 8, 4, 4, 4, 8, 8, 4,
 const Song alarmSongs[] PROGMEM =
 {
   { //Mario Theme
+    "Mario Theme",
     marioThemeMelody,
     marioThemeTempo,
     78,
     0.5f
   },
   { //Mario Underworld
+    "Mario Underworld",
     marioUnderworldMelody,
     marioUnderworldTempo,
     56,
     0.5f
   },
   { //Zelda Theme
+    "Zelda Theme",
     zeldaThemeMelody,
     zeldaThemeTempo,
     268,
     0.75f
   },
   {
+    "Jingle Bells",
     jingleBellsMelody,
     jingleBellsTempo,
     26,
     0.5f
   },
   {
+    "Wish Christmas",
     wishMelody,
     wishTempo,
     30,
     1.0f
   },
   {
+    "Santa Town",
     santaMelody,
     santaTempo,
     28,
     1.0f
   }
 };
+const uint8_t songListLength = sizeof(alarmSongs) / sizeof(alarmSongs[0]);
 
 //Store weekdays in flash memory
 const char weekDays[7][4] PROGMEM =
@@ -130,7 +138,7 @@ const uint8_t setRGBMode = 4;
 //LCD Control Variables
 uint8_t currentMode = 0;
 //For resetting currentMode, not resetting the clock
-const uint8_t maxMode = 4;
+const uint8_t maxMode = 3;
 int8_t cursorPosition = 0;
 
 //Sleep Variables
@@ -144,9 +152,11 @@ const uint8_t alarmBuzzPin = 2;
 const uint8_t alarmFrequency = 4500;
 const uint8_t alarmLength = 30;
 bool alarmBuzzing = false;
-//-2 = Random, -1 = Normal Buzzer, 0-2 = specificAlarmSong
-int8_t usersAlarmChoice = -2;
+
+//0 = Normal Buzzer, 1 = Random, 2-X = specificAlarmSong at index X - 2;
+uint8_t usersAlarmChoice = 0;
 uint8_t chosenAlarmSong = 2;
+
 Time alarmTime;
 
 Piezo buzzer(alarmBuzzPin);
@@ -169,7 +179,7 @@ void setup() {
 
   //setting up the display
   lcd.begin(16, 2);
-  
+
   //setting up the clock
   if (!rtc.begin()) {
     Serial.println(F("Clock could not properly initialise"));
@@ -191,11 +201,14 @@ void loop() {
 void checkControls() {
   buttons.updateButtonState();
 
-  //Manages mode
-  if (buttons.getButtonDown(modeSwitchButton)) {
-    setMode(currentMode + 1);
+  //Allows the mode to override the advance function
+  //Useful for cleaning up variables before moving screen
+  if (currentMode != setMusicMode) {
+    //Manages mode
+    if (buttons.getButtonDown(modeSwitchButton)) {
+      setMode(currentMode + 1);
+    }
   }
-
   //Managing the sleep states and enter button
   bool sleepButtonPressed = buttons.getButtonDown(sleepButton);
 
@@ -213,18 +226,22 @@ void checkControls() {
   //Manages the back button
   if (buttons.getButtonDown(backButton)) {
     cursorPosition--;
-    //If can't go back on current screen, go back to previous screen
-    if (cursorPosition == -1) {
-      setMode(currentMode - 1);
+    //Allows the mode to override the go back function
+    //Useful for cleaning up variables before moving screen
+    if (currentMode != setMusicMode) {
+      //Go back a screen
+      if (cursorPosition == -1) {
+        setMode(currentMode - 1);
+      }
     }
   }
 }
 
 /*
- * Manages all of the alarm states including
- * what to do when it is time for the alarm to go off and
- * when the alarm is going off and sleep is enabled/disabled
- */
+   Manages all of the alarm states including
+   what to do when it is time for the alarm to go off and
+   when the alarm is going off and sleep is enabled/disabled
+*/
 void checkAlarm() {
   static unsigned long alarmStartTime = 0;
   static unsigned long sleepStartTime = 0;
@@ -253,7 +270,7 @@ void checkAlarm() {
       sleepStartTime = currentTime.unixtime();
     }
   }
-  else { //Happens when the alarm finishes or when the alarm is turned off
+  else if (alarmBuzzing) { //Happens when the alarm finishes or when the alarm is turned off
     alarmBuzzing = false;
     disableSleep();
     stopAlarm();
@@ -262,10 +279,10 @@ void checkAlarm() {
 
   if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == alarmTime.second && !sleepEnabled && isAlarmEnabled && !alarmBuzzing) {
     //random song
-    if(usersAlarmChoice == -2) {
+    if (usersAlarmChoice == 1) {
       chosenAlarmSong = chooseRandomSong();
     }
-    
+
     soundAlarm();
     alarmBuzzing = true;
     alarmStartTime = currentTime.unixtime();
@@ -287,7 +304,7 @@ void disableSleep() {
 }
 
 void soundAlarm() {
-  if(usersAlarmChoice == -1 ) {
+  if (usersAlarmChoice == 0 ) {
     tone(alarmBuzzPin, alarmFrequency);
   }
   else {
@@ -307,17 +324,24 @@ void stopAlarm() {
    0-(Time Display) 1-(Set Time) 2-(Set Alarm) 3-(Set Alarm Music) 4-(Set LCD Color)
 */
 void LCDControl() {
+  //This must be changed before calling the screen function
+  //because the screen function can change the mode
+  //itself, making this incorrect when the function gives control
+  //back to this one
   static uint8_t previousMode = 0;
 
   switch (currentMode) {
     //Display Time
     case 0:
+      previousMode = currentMode;
       printDate();
       printTime(getCurrentTime());
+      cursorPosition = 0; //Make sure using sleep didn't change it
       break;
     //Set time
     case 1:
       if (currentMode != previousMode) {
+        previousMode = currentMode;
         lcd.setCursor(0, 0);
         lcd.print(F("Set Time:"));
         editTime(true, false);
@@ -329,6 +353,7 @@ void LCDControl() {
     //Set Alarm
     case 2:
       if (currentMode != previousMode) {
+        previousMode = currentMode;
         lcd.setCursor(0, 0);
         lcd.print(F("Set Alarm:"));
         editTime(true, true);
@@ -339,17 +364,27 @@ void LCDControl() {
       break;
     //Set Alarm Music
     case 3:
-
+      if (currentMode != previousMode) {
+        previousMode = currentMode;
+        lcd.setCursor(0, 0);
+        lcd.print(F("Alarm Sound:"));
+        setAlarmMusic(true);
+      }
+      else {
+        setAlarmMusic(false);
+      }
       break;
     //Set LCD Color
     case 4:
 
       break;
   }
-
-  previousMode = currentMode;
 }
 
+/*
+   Sets the mode properly and resets
+   variables for the new screen
+*/
 void setMode(int8_t modeNumber) {
   currentMode = wrap(0, maxMode, modeNumber);
   cursorPosition = 0;
@@ -359,6 +394,94 @@ void setMode(int8_t modeNumber) {
   lcd.print(F("                "));
   lcd.setCursor(0, 1);
   lcd.print(F("                "));
+}
+
+/*
+   Allows the user to choose what to play when the
+   alarm goes off.
+*/
+void setAlarmMusic(bool initialize) {
+  static uint8_t previousUserChoice = usersAlarmChoice;
+  static bool sampleMode = false;
+  static bool previousSampleMode = false;
+  //Changing the users choice
+  if (buttons.getButtonDown(upButton)) {
+    usersAlarmChoice = wrap(0, 1 + songListLength, usersAlarmChoice + 1);
+  }
+  else if (buttons.getButtonDown(downButton)) {
+    usersAlarmChoice = wrap(0, 1 + songListLength, usersAlarmChoice - 1);
+  }
+
+  //Clear the current song to make new for new one
+  if (previousUserChoice != usersAlarmChoice) {
+    lcd.setCursor(0, 1);
+    lcd.print(F("                "));
+  }
+
+  //Submit song choice (Maybe trial the song)
+  if (cursorPosition == 1) {
+    sampleMode = !sampleMode;
+    if (!sampleMode) {
+      //Reset the song for next time sample mode is turned on
+      buzzer.resetSong();
+    }
+    cursorPosition = 0;
+  }
+  else if (cursorPosition == -1) { //If can't go back on current screen, go back to previous screen, also reset sampleMode
+    sampleMode = false;
+    previousSampleMode = false;
+    stopAlarm();
+    buzzer.resetSong();
+    setMode(currentMode - 1);
+    return;
+  }
+
+  //!initialize ensures that this screen doesn't get skipped while going forwards by calling setMode(currentMode + 1) twice
+  if (buttons.getButtonDown(modeSwitchButton) && !initialize) {
+    sampleMode = false;
+    previousSampleMode = false;
+    stopAlarm();
+    buzzer.resetSong();
+    setMode(currentMode + 1);
+    return;
+  }
+
+  //Line 2
+  lcd.setCursor(0, 1);
+
+  switch (usersAlarmChoice) {
+    default:
+      chosenAlarmSong = usersAlarmChoice - 2;
+      Song song;
+      memcpy_P(&song, &alarmSongs[chosenAlarmSong], sizeof(song));
+      lcd.print(song.name);
+      if (sampleMode) {
+        soundAlarm();
+      }
+      break;
+    case 0:
+      lcd.print("Normal Buzzer   ");
+      if (sampleMode) {
+        soundAlarm();
+      }
+      else {
+        stopAlarm();
+      }
+      break;
+    case 1:
+      lcd.print("Random Song     ");
+      if (sampleMode) {
+        if (previousSampleMode != sampleMode) {
+          chosenAlarmSong = chooseRandomSong();
+        }
+        soundAlarm();
+      }
+      break;
+  }
+
+
+  previousUserChoice = usersAlarmChoice;
+  previousSampleMode = sampleMode;
 }
 
 /*
@@ -395,6 +518,7 @@ void editTime(bool initialize, bool alarm) {
       alarmTime = desiredTime;
     }
     setMode(displayMode);
+    return;
   }
 
   //Finding desired change
@@ -425,12 +549,12 @@ void editTime(bool initialize, bool alarm) {
 }
 
 /*
- * Plays the song stored in the song array at specified index
- * This function will not continously play the song on a seperate thread.
- * It must be repeatedly called with the same index for the song to finish.
- * If you changed the song index, make sure you call buzzer.resetSong()
- * for it to properly start the new one correctly.
- */
+   Plays the song stored in the song array at specified index
+   This function will not continously play the song on a seperate thread.
+   It must be repeatedly called with the same index for the song to finish.
+   If you changed the song index, make sure you call buzzer.resetSong()
+   for it to properly start the new one correctly.
+*/
 void playSongAtIndex(int index) {
   Song song;
   memcpy_P(&song, &alarmSongs[index], sizeof(song));
@@ -441,14 +565,14 @@ void playSongAtIndex(int index) {
 
   uint16_t tempo[song.length];
   memcpy_P(tempo, song.tempo, song.length * 2);
-  
+
   buzzer.playSong(melody, tempo, song.length, song.speedMultiplier);
 }
 
 //Returns a random index in the alarmSongs array
 int chooseRandomSong() {
   buzzer.resetSong();
-  return random(0, sizeof(alarmSongs) / sizeof(alarmSongs[0]));
+  return random(0, songListLength);
 }
 
 /*
