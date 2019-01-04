@@ -183,14 +183,8 @@ void setup() {
   setBacklight(255, 0, 255);
 
   //Initialise alarm
-  //Run this once to initialise the EEPROM
-  alarmTime.hour = 6;
-  alarmTime.minute = 20;
-  alarmTime.second = 0;
-  EEPROM.put(eeAlarmAddress, alarmTime);
-
   //Read the alarm time from the saved memory
-  //EEPROM.get(eeAlarmAddress, alarmTime);
+  EEPROM.get(eeAlarmAddress, alarmTime);
   
   pinMode(alarmBuzzPin, OUTPUT);
   randomSeed(millis());
