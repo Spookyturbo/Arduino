@@ -222,12 +222,22 @@ void loop() {
 
 void checkControls() {
   buttons.updateButtonState();
+  static unsigned long lastButtonPressTime = 0;
 
+  //Check for time since last action
+  if(currentMode != displayMode) {
+    //If over 1 minute go back to displayMode
+    if(abs(millis() - lastButtonPressTime) > 60000) {
+      setMode(displayMode);
+    }
+  }
+  
   //Allows the mode to override the advance function
   //Useful for cleaning up variables before moving screen
   if (currentMode != setMusicMode) {
     //Manages mode
     if (buttons.getButtonDown(modeSwitchButton)) {
+      lastButtonPressTime = millis();
       setMode(currentMode + 1);
     }
   }
@@ -235,6 +245,7 @@ void checkControls() {
   bool sleepButtonPressed = buttons.getButtonDown(sleepButton);
 
   if (sleepButtonPressed) {
+    lastButtonPressTime = millis();
     //also acts as enter/next button
     cursorPosition++;
     if (!sleepEnabled) {
@@ -247,6 +258,7 @@ void checkControls() {
 
   //Manages the back button
   if (buttons.getButtonDown(backButton)) {
+    lastButtonPressTime = millis();
     cursorPosition--;
     //Allows the mode to override the go back function
     //Useful for cleaning up variables before moving screen
@@ -256,6 +268,15 @@ void checkControls() {
         setMode(currentMode - 1);
       }
     }
+  }
+
+  //Used for determining if idle
+  if(buttons.getButton(upButton)) {
+    lastButtonPressTime = millis();
+  }
+
+  if(buttons.getButton(downButton)) {
+    lastButtonPressTime = millis();
   }
 }
 
