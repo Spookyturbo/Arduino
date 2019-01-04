@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <RTClib.h>
 #include <Piezo.h>
+#include <EEPROM.h>
 
 struct Time {
   unsigned int hour: 5;
@@ -159,6 +160,8 @@ const uint8_t alarmBuzzPin = 2;
 const uint8_t alarmFrequency = 4500;
 const uint8_t alarmLength = 30;
 bool alarmBuzzing = false;
+//EEPROM address for the alarm storage (Keeping alarm in case of power loss)
+const uint8_t eeAlarmAddress = 0;
 
 //0 = Normal Buzzer, 1 = Random, 2-X = specificAlarmSong at index X - 2;
 uint8_t usersAlarmChoice = 0;
@@ -180,9 +183,15 @@ void setup() {
   setBacklight(255, 0, 255);
 
   //Initialise alarm
+  //Run this once to initialise the EEPROM
   alarmTime.hour = 6;
   alarmTime.minute = 20;
   alarmTime.second = 0;
+  EEPROM.put(eeAlarmAddress, alarmTime);
+
+  //Read the alarm time from the saved memory
+  //EEPROM.get(eeAlarmAddress, alarmTime);
+  
   pinMode(alarmBuzzPin, OUTPUT);
   randomSeed(millis());
 
@@ -634,6 +643,8 @@ void editTime(bool initialize, bool alarm) {
     }
     else {
       alarmTime = desiredTime;
+      //Save the new alarm time into memory
+      EEPROM.put(eeAlarmAddress, alarmTime);
     }
     setMode(displayMode);
     return;
