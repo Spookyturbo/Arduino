@@ -1,34 +1,31 @@
 #include <SPI.h>
 #include <RH_RF69.h>
-#include <Servo.h>
-//1000-2000 - 1500 = no movement
 
 /*********Radio********/
 #define RF69_FREQ 915.0
 #define RFM69_INT     3  // 
 #define RFM69_CS      4  //
 #define RFM69_RST     2  // "A"
-#define LED           13
 
 RH_RF69 rf69(RFM69_CS, RFM69_INT);
-/*********Inputs*******/
-//#define servoPin 6
-#define button 7
+/*********Motors*******/
+//All in microseconds
+const uint16_t maxPWM = 2000;
+const uint16_t minPWM = 1000;
+const uint16_t neutralPWM = 1500;
 
-//Servo motor;
+/*********Inputs*******/
+const uint8_t potPin = A0;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  Serial.begin(9600);
 
-  pinMode(LED, OUTPUT);     
+  //Radio Config
   pinMode(RFM69_RST, OUTPUT);
   digitalWrite(RFM69_RST, LOW);
 
-  Serial.println("Feather RFM69 TX Test!");
-  Serial.println();
-
-  // manual reset
+  //Reset radio
   digitalWrite(RFM69_RST, HIGH);
   delay(10);
   digitalWrite(RFM69_RST, LOW);
@@ -51,46 +48,34 @@ void setup() {
                     
   rf69.setEncryptionKey(key);
   
-  pinMode(LED, OUTPUT);
-  
   Serial.print("RFM69 radio @");  Serial.print((int)RF69_FREQ);  Serial.println(" MHz");
 
   //Set up motor
-  pinMode(A0, INPUT);
-  pinMode(button, INPUT);
-  //motor.attach(servoPin);
+  pinMode(potPin, INPUT);
 }
 
-int lastSpeed = 1500;
-
 void loop() {
-  // put your main code here, to run repeatedly: 
+  //Used to not spam update the radio
+  static int lastPWM = 0;
+  
+  int input = analogRead(potPin);
+  //Map the analog input to a usable PWM signal
+  int PWMValue = map(input, 0, 1022, minPWM, maxPWM);
 
-  float percent;
-  float input = analogRead(A0);
+  //Create a larger deadzone for stopping
+  if(PWMValue > 1450 && PWMValue < 1550) {
+    PWMValue = neutralPWM;
+  }
+  
+  Serial.print(F("Received: ")); Serial.println(PWMValue);
 
-  if(input >= 500 && input <= 520) {
-    percent = 0;
-  }
-  else {
-    input -= 500.0;
-    percent = (input / 500) * 100;
-  }
+  //This might need to be used to stop stuttering
+//  if(PWMValue <= lastPWM + 4 && PWMValue >= lastSpeed - 1) {
+//    return;
+//  }
+//  lastPWM = PWMValue;
 
-  int PWMValue = percent * 5 + 1500;
-  Serial.println(PWMValue);
-  if(!digitalRead(button)) {
-   PWMValue = 1500; 
-  }
-
-  if(PWMValue <= lastSpeed + 4 && PWMValue >= lastSpeed - 1) {
-    return;
-  }
-  lastSpeed = PWMValue;
   uint8_t infoSend[2] = {(uint8_t) PWMValue, (uint8_t) (PWMValue >> 8)};
   rf69.send(infoSend, 2);
   rf69.waitPacketSent();
-  
-  //motor.writeMicroseconds(PWMValue);
-  
 }
