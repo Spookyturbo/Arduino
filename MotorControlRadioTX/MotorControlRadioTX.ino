@@ -16,6 +16,10 @@ const uint16_t neutralPWM = 1500;
 
 /*********Inputs*******/
 const uint8_t potPin = A0;
+const uint8_t fwdButton = 6;
+const uint8_t speedIncreaseButton = 5;
+const uint8_t revButton = 7;
+const uint8_t powerButton = 8;
 
 void setup() {
   // put your setup code here, to run once:
@@ -30,7 +34,7 @@ void setup() {
   delay(10);
   digitalWrite(RFM69_RST, LOW);
   delay(10);
-  
+
   if (!rf69.init()) {
     Serial.println("RFM69 radio init failed");
     while (1);
@@ -44,38 +48,78 @@ void setup() {
   rf69.setTxPower(20, true);  // range from 14-20 for power, 2nd arg must be true
 
   uint8_t key[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-                    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-                    
+                    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+                  };
+
   rf69.setEncryptionKey(key);
-  
+
   Serial.print("RFM69 radio @");  Serial.print((int)RF69_FREQ);  Serial.println(" MHz");
 
   //Set up motor
-  pinMode(potPin, INPUT);
+  pinMode(fwdButton, INPUT_PULLUP);
+  pinMode(revButton, INPUT_PULLUP);
+  pinMode(powerButton, INPUT_PULLUP);
+  pinMode(speedIncreaseButton, INPUT_PULLUP);
 }
 
 void loop() {
   //Used to not spam update the radio
   static int lastPWM = 0;
-  
-  int input = analogRead(potPin);
-  //Map the analog input to a usable PWM signal
-  int PWMValue = map(input, 0, 1022, minPWM, maxPWM);
+  int PWMValue;
 
-  //Create a larger deadzone for stopping
-  if(PWMValue > 1450 && PWMValue < 1550) {
+  //  int input = analogRead(potPin);
+  //  //Map the analog input to a usable PWM signal
+  //  int PWMValue = map(input, 0, 1022, minPWM, maxPWM);
+  //
+  //  //Create a larger deadzone for stopping
+  //  if(PWMValue > 1450 && PWMValue < 1550) {
+  //    PWMValue = neutralPWM;
+  //  }
+
+  //Check for calling to enable/disable
+  if (powerButtonPressed()) {
+    Serial.println("Sending");
+    uint8_t infoSend[1] = {(uint8_t) 0};
+    rf69.send(infoSend, 1);
+    rf69.waitPacketSent();
+  }
+
+  if (!digitalRead(fwdButton)) {
+    if (!digitalRead(speedIncreaseButton) && lastPWM <= 1300 && lastPWM >= 1003) {
+      PWMValue = lastPWM - 3;
+    }
+    else if(digitalRead(speedIncreaseButton)) {
+      PWMValue = 1300;
+    }
+  }
+  else if (!digitalRead(revButton)) {
+    PWMValue = 1700;
+  }
+  else {
     PWMValue = neutralPWM;
   }
-  
-  Serial.print(F("Received: ")); Serial.println(PWMValue);
 
   //This might need to be used to stop stuttering
-//  if(PWMValue <= lastPWM + 4 && PWMValue >= lastSpeed - 1) {
-//    return;
-//  }
-//  lastPWM = PWMValue;
+  if (PWMValue <= lastPWM + 2 && PWMValue >= lastPWM - 1) {
+    return;
+  }
+
+  lastPWM = PWMValue;
 
   uint8_t infoSend[2] = {(uint8_t) PWMValue, (uint8_t) (PWMValue >> 8)};
   rf69.send(infoSend, 2);
   rf69.waitPacketSent();
+}
+
+bool powerButtonPressed() {
+  static bool previousState = false;
+  bool state = !digitalRead(powerButton);
+  Serial.println(state);
+  if (state && !previousState) {
+    previousState = state;
+    return true;
+  }
+
+  previousState = state;
+  return false;
 }
