@@ -169,20 +169,5 @@ void checkForUpdates() {
 }
 
 void loop() {
-  checkForUpdates();
-  //Serial.print("Drive enabled: ");Serial.println(driveEnabled);
-  //If the speed wasn't update in the specified time frame, disable motors for safety reasons
-  if (millis() - lastFed > motorTimeout) {
-    //driveEnabled = false;
-    //digitalWrite(enableDrive, driveEnabled);
-    //Should this disable or just set speed to neutral?
-  }
-
-  //Update motor controller
-  if (driveEnabled) {
-    motor.writeMicroseconds(PWMValue);
-  }
-  else {
-    motor.writeMicroseconds(neutralPWM);
-  }
+digitalWrite(enableDrive, HIGH);
 }
