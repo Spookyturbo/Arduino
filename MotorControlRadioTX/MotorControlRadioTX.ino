@@ -114,7 +114,8 @@ void loop() {
   else if(millis() - lastRemoteControl > 4000){ //If controller hasn't been in use for 4 seconds, use pedal on board (Kid control)
     bool lever = getLever();
     bool pedal = getPedalPressed();
-    
+    delay(10);
+    Serial.print("Lever: "); Serial.print(lever); Serial.print(" Pedal: "); Serial.print(pedal); Serial.print(" PWM: "); Serial.println(PWMValue);
     if(pedal) {
       if(lever) {
         PWMValue = 1300;
@@ -132,11 +133,11 @@ void loop() {
   }
   
   //This might need to be used to stop stuttering
-  if (PWMValue <= lastPWM + 2 && PWMValue >= lastPWM - 1) {
-    //Set speed wont be called so feed the timeout
-    feedTimeout();
-    return;
-  }
+//  if (PWMValue <= lastPWM + 2 && PWMValue >= lastPWM - 1) {
+//    //Set speed wont be called so feed the timeout
+//    feedTimeout();
+//    return;
+//  }
   lastPWM = PWMValue;
   //Also feeds the timeout
   setSpeed(PWMValue);
@@ -146,7 +147,7 @@ void loop() {
 
 //1000-2000 (1500 being neutral)
 void setSpeed(uint16_t speed) {
-//  Serial.print("Setting speed "); Serial.println((uint8_t) SET_SPEED, HEX);
+  Serial.print("Setting speed "); Serial.println(speed);
   uint8_t info[] = {(uint8_t) SET_SPEED, (uint8_t) speed, (uint8_t) (speed >> 8)};
   rf69.send(info, sizeof(info));
   rf69.waitPacketSent();
@@ -173,7 +174,7 @@ bool getPedalPressed() {
   uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
 
-  if (rf69.waitAvailableTimeout(200)) {
+  if (rf69.waitAvailableTimeout(400)) {
     if (rf69.recv(buf, &len)) {
       return buf[0];
     }
@@ -191,7 +192,7 @@ bool getLever() {
   uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
 
-  if (rf69.waitAvailableTimeout(200)) {
+  if (rf69.waitAvailableTimeout(400)) {
     if (rf69.recv(buf, &len)) {
       return buf[0];
     }
@@ -214,7 +215,7 @@ unsigned long getMotorTimeout() {
   uint8_t buf[RH_RF69_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
 
-  if (rf69.waitAvailableTimeout(200)) {
+  if (rf69.waitAvailableTimeout(400)) {
     if (rf69.recv(buf, &len)) {
       unsigned long timeout = buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
       return timeout;

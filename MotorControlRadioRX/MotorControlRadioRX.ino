@@ -109,7 +109,7 @@ void checkForUpdates() {
         uint8_t command = buf[0];
         if (command == SET_SPEED) {
           //Serial.println("Setting speed");
-          PWMValue = buf[1] << 8 | buf[0];
+          PWMValue = buf[2] << 8 | buf[1];
           lastFed = millis();
         }
         else if (command == ENABLE_DRIVE) {
@@ -177,10 +177,10 @@ void loop() {
     //digitalWrite(enableDrive, driveEnabled);
     //Should this disable or just set speed to neutral?
   }
-
+  Serial.println(PWMValue);
   //Update motor controller
   if (driveEnabled) {
-    motor.writeMicroseconds(PWMValue);
+    //motor.writeMicroseconds(PWMValue);
   }
   else {
     motor.writeMicroseconds(neutralPWM);
