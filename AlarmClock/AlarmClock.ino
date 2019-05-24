@@ -140,13 +140,14 @@ const uint8_t upButton = 5;
 const uint8_t displayMode = 0;
 const uint8_t setTimeMode = 1;
 const uint8_t setAlarmMode = 2;
-const uint8_t setMusicMode = 3;
-const uint8_t setRGBMode = 4;
+const uint8_t setDateMode = 3;
+const uint8_t setMusicMode = 4;
+const uint8_t setRGBMode = 5;
 
 //LCD Control Variables
 uint8_t currentMode = 0;
 //For resetting currentMode, not resetting the clock
-const uint8_t maxMode = 4;
+const uint8_t maxMode = 5;
 int8_t cursorPosition = 0;
 
 //Sleep Variables
@@ -313,7 +314,7 @@ void checkAlarm() {
     stopAlarm();
   }
 
-
+  //Trigger the Alarm
   if (currentTime.hour() == alarmTime.hour && currentTime.minute() == alarmTime.minute && currentTime.second() == alarmTime.second && !sleepEnabled && isAlarmEnabled && !alarmBuzzing) {
     //random song
     if (usersAlarmChoice == 1) {
@@ -370,14 +371,14 @@ void LCDControl() {
 
   switch (currentMode) {
     //Display Time
-    case 0:
+    case displayMode:
       previousMode = currentMode;
-      printDate();
+      printDate(true);
       printTime(getCurrentTime());
       cursorPosition = 0; //Make sure using sleep didn't change it
       break;
     //Set time
-    case 1:
+    case setTimeMode:
       if (currentMode != previousMode) {
         previousMode = currentMode;
         lcd.setCursor(0, 0);
@@ -389,7 +390,7 @@ void LCDControl() {
       }
       break;
     //Set Alarm
-    case 2:
+    case setAlarmMode:
       if (currentMode != previousMode) {
         previousMode = currentMode;
         lcd.setCursor(0, 0);
@@ -400,8 +401,17 @@ void LCDControl() {
         editTime(false, true);
       }
       break;
+    //Set date
+    case setDateMode:
+      if(currentMode != previousMode) {
+        previousMode = currentMode;
+        lcd.setCursor(0, 0);
+        lcd.print(F("Set Date:"));
+      }
+      editDate();
+      break;
     //Set Alarm Music
-    case 3:
+    case setMusicMode:
       if (currentMode != previousMode) {
         previousMode = currentMode;
         lcd.setCursor(0, 0);
@@ -413,7 +423,7 @@ void LCDControl() {
       }
       break;
     //Set LCD Color
-    case 4:
+    case setRGBMode:
       if (currentMode != previousMode) {
         previousMode = currentMode;
         lcd.setCursor(0, 0);
@@ -692,6 +702,26 @@ void editTime(bool initialize, bool alarm) {
   printTime(desiredTime, (displayNumber) ? -1 : cursorPosition);
 }
 
+void editDate() {
+  //Use big button to go back to main screen
+  if (cursorPosition == 1) {
+    setMode(displayMode);
+    return;
+  }
+  
+  //TimeSpan(Days, Hours, Minutes, Seconds)
+  if(buttons.getButtonHeld(upButton, 100)) {
+    //Set time to current time +1 day
+    rtc.adjust(rtc.now() + TimeSpan(1, 0, 0, 0));
+  }
+  else if(buttons.getButtonHeld(downButton, 100)) {
+    //Set time to current time -1 day
+    rtc.adjust(rtc.now() - TimeSpan(1, 0, 0, 0));
+  }
+
+  printDate(false);
+}
+
 /*
    Plays the song stored in the song array at specified index
    This function will not continously play the song on a seperate thread.
@@ -724,7 +754,7 @@ int chooseRandomSong() {
    in the format: WWW, MMM DD
    Example: Tue, Oct 27
 */
-void printDate() {
+void printDate(bool firstRow) {
   DateTime currentTime = rtc.now();
 
   //Retrieve month from flash memory
@@ -736,12 +766,21 @@ void printDate() {
   char weekDay[4];
   memcpy_P(&weekDay, &weekDays[currentTime.dayOfTheWeek()], 4);
 
-  lcd.setCursor(0, 0);
+  if(firstRow) {
+    lcd.setCursor(0, 0);
+  }
+  else {
+    //Line 2
+    lcd.setCursor(0, 1);
+  }
+  
   lcd.print(weekDay);
   lcd.print(", ");
   lcd.print(month);
   lcd.print(" ");
   lcd.print(day);
+  //Covers up any zeroes when transitioning from 30s to singles
+  lcd.print(F("  "));
 
 }
 
