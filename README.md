@@ -1,7 +1,3 @@
-### What is this repository for? ###
+A series of Arduino related projects
 
-For storing arduino projects accross multiple computers
-
-### How do I get set up? ###
-
-Just clone and it should come with all the dependencies except the Arduino IDE
+Some were for my robotics club during high school, others are just miscellaneous
